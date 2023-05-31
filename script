@@ -1,0 +1,44 @@
+pipeline {
+    agent { label "slave1" }
+    
+    triggers {
+        pollSCM('* * * * *')
+    }    
+
+    stages {
+        stage('clone_project_A') {
+            steps {
+                echo 'clone project A'
+                git branch: 'main', credentialsId: 'admin-tomcat', url: 'https://github.com/PRAMOD0511/helloworld_project.git'
+            }
+        }
+        stage('build_project_A') {
+            steps {
+                echo 'build_projectA'
+                sh 'yum install maven -y'
+                sh 'mvn -Dmaven.test.failure.ignore=true install'
+            }
+        } 
+        stage('Deploy_project_A') {
+            steps {
+                echo 'Deploy_project_A'
+                deploy adapters: [tomcat8(credentialsId: 'admin-tomcat', path: '', url: 'http://13.126.73.20:8080/')], contextPath: 'WAR/EAR', war: '**/*.war'
+            }
+        }
+        stage('Deploy_Test_team') {
+            steps {
+                echo 'Deploy_project_A'
+            }
+        } 
+        stage('Deploy_production_1') {
+            steps {
+                echo 'Deploy_production_1'
+            }
+        } 
+        stage('Deploy_production_2') {
+            steps {
+                echo 'Deploy_production_2'
+            }
+        }        
+    }
+}
